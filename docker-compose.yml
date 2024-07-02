@@ -1,3 +1,12 @@
+# version: '1'
+# services:
+#   web:
+#     build: .
+#     ports:
+#       - "5000:5000"
+#     environment:
+#       - FLASK_APP=server.py
+
 version: '0.1'
 
 services:
@@ -6,11 +15,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - .:/app
     user: root
-    expose: 
-      - 8080
+    ports:
+      - "5001:5000"
     depends_on:
-      - db
+     - db
   db:
     platform: linux/x86_64
     build:
@@ -35,3 +46,6 @@ services:
       - "6379:6379"
     depends_on:
       - db
+networks:
+  my_net:
+    driver: bridge
