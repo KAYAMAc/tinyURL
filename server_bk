@@ -1,0 +1,49 @@
+from flask import Flask, jsonify
+import hashlib
+import base64
+from mysqlDB import db 
+
+app = Flask(__name__)
+
+temp_storage = {}
+
+@app.route('/urls', methods=['GET'])
+def get_urls():
+    sql = "SELECT * FROM url"
+    data = db.select_db(sql)
+    return jsonify({"code": 0, "data": data, "msg": "success"})
+
+@app.route('/shorten/<curr_url>', methods=['GET'])
+def get_url(curr_url):
+    sha256_hash = hashlib.sha256(curr_url.encode()).digest()
+    base64_encoded = base64.urlsafe_b64encode(sha256_hash).decode()[:6]  # Taking only the first 6 characters
+    sql = f"select * from shortened_url where short_url = {base64_encoded}"
+    res = db.select_db(sql)
+    if res:
+        return jsonify({'response': res})
+    else:
+        return jsonify({'response': 'no result'})
+    
+@app.route('/create/<curr_url>', methods=['GET'])
+def create_url(curr_url):
+    sha256_hash = hashlib.sha256(curr_url.encode()).digest()
+    base64_encoded = base64.urlsafe_b64encode(sha256_hash).decode()[:6]  # Taking only the first 6 characters
+    sql = f"insert into shortened_url ({curr_url}, {base64_encoded}) values (long_url, short_url)"
+    try:
+        res = db.execute_db(sql)
+    except Exception as e:
+        return jsonify({'response': 'error inserting'})
+    return jsonify({'response': 'successful'})
+
+@app.route('/access/<short_url>', methods=['GET'])
+def redirect(short_url):
+    sha256_hash = hashlib.sha256(curr_url.encode()).digest()
+    base64_encoded = base64.urlsafe_b64encode(sha256_hash).decode()[:6]  # Taking only the first 6 characters
+    if base64_encoded not in temp_storage:
+        temp_storage[curr_url] = base64_encoded
+    return jsonify({'shortened': base64_encoded})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
+
+
