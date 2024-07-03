@@ -15,15 +15,6 @@ services:
       - 3306
     ports:
       - "3306:3306"
-    
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    restart: always
-    ports:
-      - '6000:27017'
-
-
   redis:
     platform: linux/x86_64
     image: redis:7.2.2

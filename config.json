@@ -1,0 +1,10 @@
+{
+    "username": "root",
+    "password": "root",
+    "protocol": "tcp",
+    "host": "db",
+    "port": 3306,
+    "database": "url",
+    "redisInstance": "redis",
+    "redisPort": "6379"
+}
